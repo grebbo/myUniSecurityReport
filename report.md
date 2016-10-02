@@ -9,7 +9,9 @@
 #### 2.3. Analisi dei log
 ### 3. Possibili attacchi
 ### 4. Contromisure
-
+#### 4.1. Content Provider
+#### 4.2. Esportazione/importazione database per il backup 
+#### 4.3. Analisi dei log
   
 
 
