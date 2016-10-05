@@ -1,0 +1,1 @@
+pandoc --number-sections --from=markdown "report.md" --to=latex -o "report.pdf"
