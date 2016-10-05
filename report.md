@@ -18,6 +18,11 @@ che un agente dotato di tali permessi potrebbe accedere senza restrizioni a
 risorse, come ad esempio file e cartelle, che, normalmente, gli sarebbero
 preclusi.
 
+In aggiunta, si segnala che viene utilizzato il client delle API di Google che implementa il protocollo [OAuth2](https://tools.ietf.org/html/rfc6749) per l'autenticazione, 
+insieme a HSTS (HTTP Strict Transport Security), per garantire autenticazione, integrità e riservatezza delle informazioni scambiate con i server di google, durante la
+procedura di login (e seguente download di immagini di profilo e copertina) e l'interazione con Google Calendar e Google Maps, 
+eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la cui richiesta viene fatta tramite HTTPS e viene inviato dal server codificato in base64.
+
 # Vulnerabilità conosciute
 
 ## Content Provider
