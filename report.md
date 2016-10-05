@@ -31,6 +31,11 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 
 ## Analisi dei log
 
+L'utilizzo del log può essere un'arma a doppio taglio per un programmatore: se, da una parte, risulta essere un ottimo strumento nella fase di debugging del software, dall'altra può, al contrario, rivelarsi una fonte più o meno determinante di informazioni riguardo il comportamento del codice per un potenziale agente malevolo.
+Infatti, può contenere ben in chiaro dati che dovrebbero essere solo a discrezione dell'utilizzatore e dell'ambiente interno all'applicazione oppure dare informazioni rilevanti circa chiamate a funzione, codici d'errore o output di debug.
+
+-esempio myuniversity-
+
 # Possibili attacchi
 
 ## Content Provider
@@ -46,4 +51,8 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 ## Esportazione/importazione database per il backup
 
 ## Analisi dei log
+
+La soluzione più semplice e efficace consiste nella rimozione dei messaggi di log, in quanto superflui ai fini dell'esecuzione dell'applicazione e dunque solo rischiosi a debug terminato.
+
+-come levare log-
 
