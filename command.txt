@@ -1,1 +1,1 @@
-pandoc -s -N --from=markdown --to=latex --latex-engine=xelatex -H ./subtitle.tex -V subtitle="Analisi delle vulnerabilità e messa in sicurezza dell'applicazione MyUniversity" -V documentclass="scrreprt" ./report.md -o ./report.pdf
+pandoc -N --from=markdown --to=latex --latex-engine=xelatex -s -H ./subtitle.tex -V subtitle="Vulnerabilità e messa in sicurezza dell’applicazione MyUniversity" -V documentclass="scrreprt" -V linkcolor="blue" -V papersize="A4" -V monofont="Consolas" -V mainfont="Times New Roman" -V fontsize="12pt" --toc ./report.md -o ./report.pdf
