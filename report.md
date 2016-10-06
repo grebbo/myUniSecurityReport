@@ -1,3 +1,4 @@
+
 % MyUniversity Security Report
 
 # Introduzione e premesse
@@ -41,6 +42,9 @@ Il file, come detto, si trova in una cartella pubblica ed è facilmente accessib
 # Possibili attacchi
 
 ## Content Provider
+Un agente tramite applicazione malevola potrebbe cambiare data e ora di lezioni e/o esami, per poter così direzionare l'utente in un certo luogo e ad una certa ora per intenti criminosi, potrebbe altresì cancellare o modificare la data di un esame per far sì che lo studente non vi si presenti rovinandogli così la carriera accademica (per esempio facendo posticipare la laurea).
+
+In pratica l'attacco, posto che l'attaccante conosca la struttura del database e le funzioni del content provider si esegue semplicemente chiamando letture tramite query e/o modifiche tramite update sugli stessi dati.
 
 ## Esportazione/importazione database per il backup
 
@@ -48,9 +52,27 @@ I possibili attacchi che possono essere effettuati sfruttando la vulnerabilità 
 
 # Contromisure
 
-## Content Provider
+## Content Provider 
+Per evitare che app di terzi (potenzialmente malevoli) possano accedere e modificare i dati nel database possiamo semplicemente definire una nuova tipologia di permesso, necessaria per poter accedere al nostro content provider: l'utente verrebbe così avvisato e dovrebbe dunque accettare che la suddetta app possa accedervi.
+
+Definisco un permesso richiedente firma.
+
+```xml
+<permission android:name="com.grebeteam.myuniversity.provider.IO"
+android:protectionLevel="signature" />
+```
+
+In questo modo solo applicazioni aventi nel manifest
+
+```xml
+<uses-permission android:name="com.grebeteam.myuniversity.provider.IO"/>
+```
+recanti la stessa firma di MyUniversity potranno accedere al content provider, rimuovendo così la vulnerabilità.
+
+E quindi all'interno di <provider></provider> aggiungo android:permission= "com.grebeteam.myuniversity.provider.IO"
 
 ## Esportazione/importazione database per il backup
 
 
 
+\end{document}
