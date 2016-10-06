@@ -28,8 +28,12 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 
 ## Content Provider
 
-## Esportazione/importazione database per il backup
+## Esportazione/importazione database per il backup {#foo}
 
+All'interno dell'applicazione è presente una funzionalità per l'esportazione e l'importazione del database della stessa, in modo da fornire all'utente un backup locale. L'attuale implementazione dell'esportazione
+crea il file `/MyUniversity/exportedDB.sqlite` nella memoria interna del telefono (`/storage/emulated/0/`) L'importazione, in maniera duale rispetto
+all'esportazione cerca il file `/MyUniversity/exportedDB.sqlite` e lo sostituisce completamente al database in uso (da evidenziare che è possibile importare il database unicamente nella fase di primo setup dell'applicazione).
+Il file, come detto, si trova in una cartella pubblica ed è facilmente accessibile, quindi, da altre applicazioni, anche malevole, che potrebbero sia leggere, sia scrivere su di esso, senza alcun problema. 
 
 # Possibili attacchi
 
@@ -37,6 +41,7 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 
 ## Esportazione/importazione database per il backup
 
+I possibili attacchi che possono essere effettuati sfruttando la vulnerabilità citata [qui](#foo)
 
 # Contromisure
 
