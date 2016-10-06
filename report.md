@@ -15,13 +15,16 @@ root all’interno del dispositivo in cui è installata MyUniversity.
 
 I permessi di root, infatti, renderebbero la presente analisi inadeguata, visto
 che un agente dotato di tali permessi potrebbe accedere senza restrizioni a
-risorse, come ad esempio file e cartelle, che, normalmente, gli sarebbero
-preclusi.
+risorse, come file e cartelle, a lui precluse.
+
+Una tipica vulnerabilità che si può riscontrare su sistemi Android precedenti 4.1 riguarda l'analisi dei log file, contenenti messaggi riguardanti il codice utili in fase di debugging dell'applicazione stessa. L'accesso a tale risorsa può fornire ad un agente malevolo informazioni sensibili dell'utente o riguardo l'esecuzione del software previa chiamata `Runtime.getRuntime().exec("logcat")`. 
+MyUniversity è compatibile solo con devices con Android 4.4(KitKat) o superiore, risolvendo questo problema su ogni dispositivo *unrooted*.  
 
 In aggiunta, si segnala che viene utilizzato il client delle API di Google che implementa il protocollo [OAuth2](https://tools.ietf.org/html/rfc6749) per l'autenticazione, 
 insieme a HSTS (HTTP Strict Transport Security), per garantire autenticazione, integrità e riservatezza delle informazioni scambiate con i server di google, durante la
 procedura di login (e seguente download di immagini di profilo e copertina) e l'interazione con Google Calendar e Google Maps, 
 eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la cui richiesta viene fatta tramite HTTPS e viene inviato dal server codificato in base64.
+
 
 # Vulnerabilità conosciute
 
@@ -29,12 +32,6 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 
 ## Esportazione/importazione database per il backup
 
-## Analisi dei log
-
-L'utilizzo del log può essere un'arma a doppio taglio per un programmatore: se, da una parte, risulta essere un ottimo strumento nella fase di debugging del software, dall'altra può, al contrario, rivelarsi una fonte più o meno determinante di informazioni riguardo il comportamento del codice per un potenziale agente malevolo.
-Infatti, può contenere ben in chiaro dati che dovrebbero essere solo a discrezione dell'utilizzatore e dell'ambiente interno all'applicazione oppure dare informazioni rilevanti circa chiamate a funzione, codici d'errore o output di debug.
-
--esempio myuniversity-
 
 # Possibili attacchi
 
@@ -42,7 +39,6 @@ Infatti, può contenere ben in chiaro dati che dovrebbero essere solo a discrezi
 
 ## Esportazione/importazione database per il backup
 
-## Analisi dei log
 
 # Contromisure
 
@@ -50,9 +46,5 @@ Infatti, può contenere ben in chiaro dati che dovrebbero essere solo a discrezi
 
 ## Esportazione/importazione database per il backup
 
-## Analisi dei log
 
-La soluzione più semplice e efficace consiste nella rimozione dei messaggi di log, in quanto superflui ai fini dell'esecuzione dell'applicazione e dunque solo rischiosi a debug terminato.
-
--come levare log-
 
