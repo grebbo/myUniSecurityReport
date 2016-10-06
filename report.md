@@ -27,6 +27,9 @@ eccetto il calcolo del percorso dalla posizione corrente alla destinazione, la c
 # Vulnerabilità conosciute
 
 ## Content Provider
+MyUniversity dispone di un content provider il quale agisce come interfaccia tra applicazioni esterne e la nostra app al fine di modificare le tabelle del database.
+
+Idealmente il content provider dovrebbe dare accesso ad una fantomatica applicazione dell'unige per poter aggiornare ad ogni semestre gli orari in nostro possesso; in pratica il content provider non richiede alcuna autenticazione da parte dell'app di terzi e perciò concede ad ogni app installata sul dispositivo di cambiare orari di lezioni ed esami, cambiare le aule degli stessi e persino estrarre informazioni sulla carriera dello studente.
 
 ## Esportazione/importazione database per il backup {#foo}
 
