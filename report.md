@@ -1,6 +1,4 @@
-# MyUniversity Security Report {.unnumbered}
-
-## Vulnerabilità e messa in sicurezza dell’applicazione MyUniversity {.unnumbered}
+% MyUniversity Security Report
 
 # Introduzione e premesse
 

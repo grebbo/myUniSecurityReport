@@ -1,1 +1,1 @@
-pandoc --number-sections --from=markdown "report.md" --to=latex -o "report.pdf"
+pandoc -s -N --from=markdown --to=latex --latex-engine=xelatex -H ./subtitle.tex -V subtitle="Vulnerabilità e messa in sicurezza dell'applicazione MyUniversity" -V documentclass="scrreprt" ./report.md -o ./report.pdf
