@@ -1,4 +1,3 @@
-
 % MyUniversity Security Report
 
 # Introduzione e premesse
@@ -48,7 +47,10 @@ In pratica l'attacco, posto che l'attaccante conosca la struttura del database e
 
 ## Esportazione/importazione database per il backup
 
-I possibili attacchi che possono essere effettuati sfruttando la vulnerabilità citata [qui](#foo)
+Il possibile attacco che può essere effettuato sfruttando la vulnerabilità citata [qui](#foo) è il seguente:
+1. L'utente effettua il backup (esportazione) del database
+2. L'attaccante legge o modifica il database a proprio piacimento (in caso di sola lettura, la privacy dell'utente è a rischio)
+3. L'utente ripristina l'applicazione e importa il database di backup, ormai modificato dall'attaccante
 
 # Contromisure
 
@@ -73,6 +75,34 @@ E quindi all'interno di <provider></provider> aggiungo android:permission= "com.
 
 ## Esportazione/importazione database per il backup
 
+Per rendere più sicura l'esportazione del database è possibile firmare il file con una chiave privata creata ad-hoc e immagazzinata nel KeyStore di Android. In maniera duale, al momento dell'importazione si può esaminare la firma del backup per
+verificarne l'autenticità.
 
+### Generazione della firma {-}
+ 
+~~~~{.Java caption="Generazione della firma"}
+KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+ks.load(null);
+KeyStore.Entry entry = ks.getEntry("myunisignature", null);
+if (!(entry instanceof KeyStore.PrivateKeyEntry)) {
+	Log.w(TAG, "Not an instance of a PrivateKeyEntry");
+	return false;
+}
+Signature ecdsa = Signature.getInstance("SHA256withECDSA");
+ecdsa.initSign(((KeyStore.PrivateKeyEntry) entry).getPrivateKey());
+ecdsa.update(FileUtils.readFileToByteArray(backupDB));
+//Firma da immagazzinare e da utilizzare al momento della verifica
+byte[] signature = ecdsa.sign(); 
 
-\end{document}
+~~~~
+
+### Verifica della firma {-}
+ 
+~~~~{.Java caption="Verifica della firma"}
+Signature ecdsa = Signature.getInstance("SHA256withECDSA");
+ecdsa.initVerify(((PrivateKeyEntry) entry).getCertificate());
+ecdsa.update(FileUtils.readFileToByteArray(backupDB));
+//signature è la firma salvata nella prima parte della procedura
+boolean valid = s.verify(signature);
+~~~~
+ 
