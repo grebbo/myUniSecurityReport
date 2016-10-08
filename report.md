@@ -81,12 +81,12 @@ e recanti la stessa firma di MyUniversity potranno accedere al content provider,
 La dichiarazione del content provider diventa, quindi
 
 ```xml
- <provider>
+ <provider
 	android:name=".MyContentProvider"
 	android:authorities="com.grebeteam.myuniversity.MyContentProvider"
 	android:exported="true"
 	android:permission= "com.grebeteam.myuniversity.provider.IO"
-</provider> 
+/>
 ```
 
 \pagebreak
