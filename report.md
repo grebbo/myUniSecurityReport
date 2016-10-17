@@ -1,4 +1,5 @@
 % MyUniversity Security Report
+% Federico D'Ambrosio; Edoardo Ferrante; Enrico Ferro
 
 # Introduzione e premesse
 
@@ -33,35 +34,14 @@ MyUniversity dispone di un content provider il quale agisce come interfaccia tra
 
 Idealmente il content provider dovrebbe dare accesso ad una fantomatica applicazione dell'unige per poter aggiornare ad ogni semestre gli orari in nostro possesso; in pratica il content provider non richiede alcuna autenticazione da parte dell'app di terzi e perciò concede ad ogni app installata sul dispositivo di cambiare orari di lezioni ed esami, cambiare le aule degli stessi e persino estrarre informazioni sulla carriera dello studente.
 
-## Esportazione/importazione database per il backup {#foo}
+### Possibili attacchi
 
-All'interno dell'applicazione è presente una funzionalità per l'esportazione e l'importazione del database della stessa, in modo da fornire all'utente un backup locale. L'attuale implementazione dell'esportazione
-crea il file `/MyUniversity/exportedDB.sqlite` nella memoria interna del telefono (`/storage/emulated/0/`). L'importazione, in maniera duale rispetto
-all'esportazione cerca il file `/MyUniversity/exportedDB.sqlite` e lo sostituisce completamente al database in uso (da evidenziare che è possibile importare il database unicamente nella fase di primo setup dell'applicazione).
-Il file, come detto, si trova in una cartella pubblica ed è facilmente accessibile, quindi, da altre applicazioni, anche malevole, che potrebbero sia leggere, sia scrivere su di esso, senza alcun problema. 
-
-\pagebreak
-
-# Possibili attacchi
-
-## Content Provider
 Un agente tramite applicazione malevola potrebbe cambiare data e ora di lezioni e/o esami, per poter così direzionare l'utente in un certo luogo e ad una certa ora per intenti criminosi, potrebbe altresì cancellare o modificare la data di un esame per far sì che lo studente non vi si presenti rovinandogli così la carriera accademica (per esempio facendo posticipare la laurea).
 
 In pratica l'attacco, posto che l'attaccante conosca la struttura del database e le funzioni del content provider si esegue semplicemente chiamando letture tramite query e/o modifiche tramite update sugli stessi dati.
 
-## Esportazione/importazione database per il backup
+### Contromisure
 
-Il possibile attacco che può essere effettuato sfruttando la vulnerabilità citata [qui](#foo) è il seguente:
-
-1. L'utente effettua il backup (esportazione) del database;
-
-2. L'attaccante legge o modifica il database a proprio piacimento (in caso di sola lettura, la privacy dell'utente è a rischio);
-
-3. L'utente ripristina l'applicazione e importa il database di backup, ormai modificato dall'attaccante;
-
-# Contromisure
-
-## Content Provider 
 Per evitare che app di terzi (potenzialmente malevoli) possano accedere e modificare i dati nel database possiamo semplicemente definire una nuova tipologia di permesso, necessaria per poter accedere al nostro content provider: l'utente verrebbe così avvisato e dovrebbe dunque accettare che la suddetta app possa accedervi.
 
 Definisco un permesso richiedente firma.
@@ -89,9 +69,24 @@ La dichiarazione del content provider diventa, quindi
 />
 ```
 
-\pagebreak
+## Esportazione/importazione database per il backup {#foo}
 
-## Esportazione/importazione database per il backup
+All'interno dell'applicazione è presente una funzionalità per l'esportazione e l'importazione del database della stessa, in modo da fornire all'utente un backup locale. L'attuale implementazione dell'esportazione
+crea il file `/MyUniversity/exportedDB.sqlite` nella memoria interna del telefono (`/storage/emulated/0/`). L'importazione, in maniera duale rispetto
+all'esportazione cerca il file `/MyUniversity/exportedDB.sqlite` e lo sostituisce completamente al database in uso (da evidenziare che è possibile importare il database unicamente nella fase di primo setup dell'applicazione).
+Il file, come detto, si trova in una cartella pubblica ed è facilmente accessibile, quindi, da altre applicazioni, anche malevole, che potrebbero sia leggere, sia scrivere su di esso, senza alcun problema. 
+
+### Possibili attacchi
+
+Il possibile attacco che può essere effettuato sfruttando la vulnerabilità citata [qui](#foo) è il seguente:
+
+1. L'utente effettua il backup (esportazione) del database;
+
+2. L'attaccante legge o modifica il database a proprio piacimento (in caso di sola lettura, la privacy dell'utente è a rischio);
+
+3. L'utente ripristina l'applicazione e importa il database di backup, ormai modificato dall'attaccante;
+
+### Contromisure
 
 Per rendere più sicura l'esportazione/backup del database, è possibile sfruttare le **Backup API** di Google, funzioni apposite per il backup. Queste API sono 2: **Key/Value Backup**, necessario per i device con Android 5.1 o inferiore, e 
 **AutoBackup** per i dispositivi con Android 6.0 o superiore. MyUniversity è compilata avendo come target e versione minima compatibile Android 6.0, per cui è necessario implementare solamente l'aggiunta di AutoBackup. 
