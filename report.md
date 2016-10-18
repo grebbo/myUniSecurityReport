@@ -16,18 +16,7 @@ I permessi di root, infatti, renderebbero la presente analisi inadeguata, visto
 che un agente dotato di tali permessi potrebbe accedere senza restrizioni a
 risorse, come file e cartelle, a lui precluse.
 
-Una tipica vulnerabilità che si può riscontrare su sistemi Android precedenti 4.1 riguarda l'analisi dei log file, 
-contenenti messaggi riguardanti il codice utili in fase di debugging dell'applicazione stessa. L'accesso a tale risorsa può fornire ad un agente malevolo informazioni sensibili dell'utente o 
-riguardo l'esecuzione del software previa chiamata `Runtime.getRuntime().exec("logcat")`. 
-MyUniversity è compatibile solo con devices con Android 4.4 o superiore, risolvendo questo problema su ogni dispositivo *unrooted*.  
-
-In aggiunta, si segnala che viene utilizzato il client delle API di Google che implementa il protocollo [OAuth2](https://tools.ietf.org/html/rfc6749) per l'autenticazione, 
-insieme a HSTS (HTTP Strict Transport Security), per garantire autenticazione, integrità e riservatezza delle informazioni scambiate con i server di Google, durante la
-procedura di login (e seguente download di immagini di profilo e copertina) e l'interazione con Google Calendar e Google Maps, 
-eccezion fatta per il calcolo del percorso dalla posizione corrente alla destinazione, la cui richiesta viene fatta tramite HTTPS e viene inviato dal server codificato in base64.
-
-
-# Vulnerabilità conosciute
+# Vulnerabilità
 
 ## Content Provider
 MyUniversity dispone di un content provider il quale agisce come interfaccia tra applicazioni esterne e la nostra app al fine di modificare le tabelle del database.
@@ -69,7 +58,7 @@ La dichiarazione del content provider diventa, quindi
 />
 ```
 
-## Esportazione/importazione database per il backup {#foo}
+## Esportazione/importazione database per il backup
 
 All'interno dell'applicazione è presente una funzionalità per l'esportazione e l'importazione del database della stessa, in modo da fornire all'utente un backup locale. L'attuale implementazione dell'esportazione
 crea il file `/MyUniversity/exportedDB.sqlite` nella memoria interna del telefono (`/storage/emulated/0/`). L'importazione, in maniera duale rispetto
@@ -78,7 +67,7 @@ Il file, come detto, si trova in una cartella pubblica ed è facilmente accessib
 
 ### Possibili attacchi
 
-Il possibile attacco che può essere effettuato sfruttando la vulnerabilità citata [qui](#foo) è il seguente:
+Il possibile attacco che può essere effettuato sfruttando la vulnerabilità appena citata è il seguente:
 
 1. L'utente effettua il backup (esportazione) del database;
 
@@ -113,3 +102,80 @@ all'AndroidManifest.xml, dove `my_backup_rules` è il file posizionato in res/xm
 
 Se volessimo estendere il supporto per il backup a device con Android 5.1 o inferiore, sarebbe necessario implementare, previa registrazione dell'applicazione all'[Android Backup Service](https://developer.android.com/google/backup/index.html), un apposito `BackupAgent`, 
 che tenga traccia dello stato dei backup e abbia opportune implementazioni delle funzioni `onBackup()` e `onRestore()`.
+
+\pagebreak
+
+## SQL Injection
+
+Una vulnerabilità spesso trovata in applicazioni che si interfacciano con database è l'SQL Injection. Durante l'analisi di sicurezza, abbiano accertato che MyUniversity non è a rischio di tale vulnerabilità in quanto ogni interazione con il database (insert, update e delete) avviene tramite PreparedStatement appositi per database SQLite:
+`SQLiteStatement`. 
+
+Per esempio:
+```java
+public int addGrade(Course course){
+
+        String UPDATE = "update " + TABELLA_CORSI + " set " + VOTO + "= ? , " 
+					+ DATA_ESAME + "= ? where codice = " + course.getCodice();
+
+        //Statement per una query protetta da SQL Injection
+        SQLiteStatement updateStatement = myDB.compileStatement(UPDATE);
+
+        updateStatement.bindString(1, Integer.toString(course.getVoto()));
+        updateStatement.bindString(2, course.getData_esame());
+
+        return updateStatement.executeUpdateDelete();
+}
+```
+
+## Logging
+
+Una tipica vulnerabilità che si può riscontrare su sistemi Android precedenti 4.1 riguarda l'analisi dei log file, 
+contenenti messaggi riguardanti il codice utili in fase di debugging dell'applicazione stessa. L'accesso a tale risorsa può fornire ad un agente malevolo informazioni sensibili dell'utente o 
+riguardo l'esecuzione del software previa chiamata `Runtime.getRuntime().exec("logcat")`. 
+MyUniversity è compatibile solo con devices con Android 4.4 o superiore, risolvendo questo problema su ogni dispositivo *unrooted*.  
+
+## Sicurezza nelle connessioni remote
+
+Per garantire la riservatezza e l'autenticazione delle richieste http di myUniversity alle risorse remote dei server Google, viene utilizzato il client delle API di Google che implementa il protocollo [OAuth2](https://tools.ietf.org/html/rfc6749) per l'autenticazione, 
+insieme a HSTS (HTTP Strict Transport Security), per garantire autenticazione, integrità e riservatezza delle informazioni scambiate con i server di Google, durante la
+procedura di login (e seguente download di immagini di profilo e copertina) e l'interazione con Google Calendar e Google Maps, 
+eccezion fatta per il calcolo del percorso dalla posizione corrente alla destinazione, la cui richiesta viene fatta tramite HTTPS e viene inviato dal server codificato in base64.
+
+```java
+//Login tramite account Google
+GoogleSignInOptions gso = 
+	new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestEmail()
+        .build();
+
+GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+    .enableAutoManage(this, this)
+    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+    .build();
+
+private void signIn() {
+    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+    startActivityForResult(signInIntent, RC_SIGN_IN);
+}
+
+//Calcolo percorso tramite richiesta HTTPS a Google Maps
+
+String myreq = "https://maps.googleapis.com/maps/api/directions/json?origin=" 
+						+ urls[0] + "&destination=" + urls[1] + "&mode=" + urls[2];
+						
+try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+    CloseableHttpResponse response = httpClient.execute(new HttpGetHC4(myreq));
+    BufferedReader rd = new BufferedReader(
+    new InputStreamReader(response.getEntity().getContent()));
+    result = new StringBuilder();
+    String line = "";
+    while ((line = rd.readLine()) != null) {
+        result.append(line);
+    }
+} catch (Exception e) {
+	e.printStackTrace();
+}
+
+```
+
+
